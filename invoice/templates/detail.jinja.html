@@ -1,0 +1,140 @@
+{% extends 'base.jinja.html' %}
+{% block content %}
+  <nav class="flex mb-4 flex-row items-center justify-between">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3 rtl:space-x-reverse">
+      <li>
+        <div class="flex items-center">
+          <a href="{{ url("invoices") }}"
+             class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 ">Invoice</a>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <svg class="w-3 h-3 text-gray-400 mx-1"
+               aria-hidden="true"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+          </svg>
+          <span class="ml-1 text-sm font-medium text-gray-400 md:ml-2 ">Invoice Details</span>
+        </div>
+      </li>
+    </ol>
+    <button class="print-btn" onclick="printInvoice()">
+      <span class="printer-wrapper">
+        <span class="printer-container">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 92 75">
+            <path stroke-width="5" stroke="black" d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z">
+            </path>
+            <mask fill="white" id="path-2-inside-1_30_7">
+            <path d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z"></path>
+            </mask>
+            <path mask="url(#path-2-inside-1_30_7)" fill="black" d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z">
+            </path>
+            <circle fill="black" r="3" cy="49" cx="78"></circle>
+          </svg>
+        </span>
+        <span class="printer-page-wrapper">
+          <span class="printer-page"></span>
+        </span>
+      </span>
+      <a href="?print=true">Print</a>
+    </button>
+  </nav>
+  <section>
+    <div class="max-w-3xl mx-auto py-0 md:py-16">
+      <article class="shadow-none md:shadow-md md:rounded-md overflow-hidden">
+        <div class="md:rounded-b-md  bg-white">
+          <div class="p-9 border-b border-gray-200">
+            <div class="space-y-6">
+              <div class="flex justify-between items-top">
+                <div class="space-y-4">
+                  <div>
+                    <span class="logo text-3xl font-bold text-gray-900">A-31</span>
+                    <p class="font-bold text-lg">Invoice</p>
+                    <p>MJWebs</p>
+                  </div>
+                  <div>
+                    <p class="font-medium text-sm text-gray-400">Billed To</p>
+                    <p>{{ invoice.costumer.name }}</p>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <div>
+                    <p class="font-medium text-sm text-gray-400">Invoice Number</p>
+                    <p>A31-{{ invoice.invoice_number }}</p>
+                  </div>
+                  <div>
+                    <p class="font-medium text-sm text-gray-400">Invoice Date</p>
+                    <p>{{ invoice.date_time.strftime("%B %d, %Y") }}</p>
+                  </div>
+                  <div>
+                    <p class="font-medium text-sm text-gray-400">ABN</p>
+                    <p>{{ invoice.costumer.phone_number }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-9 border-b border-t border-gray-200">
+            <p class="font-medium text-sm text-gray-400">Note</p>
+            <p class="text-sm">Thank you for your order.</p>
+          </div>
+          <table class="w-full divide-y divide-gray-200 text-sm">
+            <thead>
+              <tr>
+                <th scope="col" class="px-9 py-4 text-left font-semibold text-gray-400">Item</th>
+                <th scope="col" class="py-3 text-left font-semibold text-gray-400"></th>
+                <th scope="col" class="py-3 text-left font-semibold text-gray-400">Amount</th>
+                <th scope="col" class="py-3 text-left font-semibold text-gray-400"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              {% for product in invoice_products %}
+                <tr>
+                  <td class="px-9 py-5 whitespace-nowrap space-x-1 flex items-center">
+                    <div>
+                      <p>{{ product.product.name }} ({{ product.count }})</p>
+                      <p class="text-sm text-gray-400">{{ product.product.color }}-{{ product.product.code }}</p>
+                    </div>
+                  </td>
+                  <td class="whitespace-nowrap text-gray-600 truncate">Roll({{ product.total_metre }})</td>
+                  <td class="whitespace-nowrap text-gray-600 truncate" id = "product-price">${{ product.total_price }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="p-9 border-b border-t border-gray-200 ">
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <div>
+                  <p class="text-gray-500 text-sm">Total Metre</p>
+                </div>
+                <p class="text-gray-500 text-sm">{{ invoice.total_metre }} Metre</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-9 border-b border-gray-200 divide-y divide-gray-200">
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <div>
+                  <p class="font-bold text-black text-lg">Amount Due</p>
+                </div>
+                <p class="font-bold text-black text-lg">${{ invoice.total_invoice_price }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+{% endblock content %}
+{% block js %}
+  <script>
+    function printInvoice() {
+      window.print();
+
+    }
+  </script>
+{% endblock js %}
