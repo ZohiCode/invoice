@@ -55,10 +55,10 @@
     <table class="w-full border-collapse bg-white text-left text-sm text-gray-500">
       <thead class="bg-gray-50">
         <tr>
-          <th scope="col" class="px-6 py-4 font-medium text-gray-900">Customer</th>
+          <th scope="col" class="px-6 py-4 font-medium text-gray-900">Fabric Type</th>
           <th scope="col" class="px-6 py-4 font-medium text-gray-900">Fabric Code</th>
-          <th scope="col" class="px-6 py-4 font-medium text-gray-900">Roll Quantity</th>
-          <th scope="col" class="px-6 py-4 font-medium text-gray-900">Total Price</th>
+          <th scope="col" class="px-6 py-4 font-medium text-gray-900">Stok</th>
+          <th scope="col" class="px-6 py-4 font-medium text-gray-900">Price</th>
           <th scope="col" class="px-6 py-4 font-medium text-gray-900"></th>
         </tr>
       </thead>
@@ -66,11 +66,21 @@
         {% for product in products %}
           <tr class="hover:bg-gray-50">
             <th class="flex items-center gap-3 px-6 py-4 font-normal text-gray-900">
-              <div class="relative h-10 w-10">
-                <img class="h-full w-full rounded-full object-cover object-center"
-                     src="{{ product.fabric_type.url }}"
-                     alt="" />
-                <span class="absolute right-0 bottom-0 h-2 w-2 rounded-full bg-green-400 ring ring-white"></span>
+              <div class="relative h-14 w-14">
+                {% if product.fabric_type %}
+                  <img class="h-full w-full rounded-md object-cover object-center"
+                       src="{{ product.fabric_type.url }}"
+                       alt="" />
+                {% else %}
+                  <img class="h-full w-full rounded-full object-cover object-center"
+                       src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                       alt="" />
+                {% endif %}
+                {% if product.stok == 0 %}
+                  <span class="absolute right-0 bottom-0 h-2 w-2 rounded-full bg-red-400 ring ring-white"></span>
+                {% else %}
+                  <span class="absolute right-0 bottom-0 h-2 w-2 rounded-full bg-green-400 ring ring-white"></span>
+                {% endif %}
               </div>
               <div class="font-medium text-center text-gray-700">{{ product.name }}</div>
             </th>
@@ -80,8 +90,8 @@
                 {{ product.code }}
               </span>
             </td>
-            <td class="px-6 py-4">{{ product.color }}</td>
-            <td class="px-6 py-4">${{product.per_metre_price}}</td>
+            <td class="px-6 py-4">{{ product.stok }}</td>
+            <td class="px-6 py-4">${{ product.per_meter_price }}</td>
             <td class="px-6 py-4">
               <div class="flex justify-end gap-4">
                 <a x-data="{ tooltip: 'Delete' }"
@@ -141,27 +151,82 @@
         </div>
         <!-- Modal body -->
         <div class="p-4 md:p-5">
-          <form class="space-y-4" method="POST">
-            {% csrf_token %}
-        
-             
-          
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label for="countries"
-                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Roll</label>
-                <select id="countries"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                >
-                  {% for product in products %}
-                    <option value="{{ product.id }}">{{ product.code }}-{{ product.color }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-             
+          <form class="max-w-sm mx-auto"
+                method="POST"
+                action="{{ url("add_product") }}">
+            <div class="mb-5">
+              <label for="email"
+                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+              <input type="text"
+                     id="name"
+                     name="name"
+                     class="shadow-sm bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                     placeholder="fabric name"
+                     required />
+            </div>
+            <div class="flex items-center justify-center w-full">
+              <label for="dropzone-file"
+                     class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                       aria-hidden="true"
+                       xmlns="http://www.w3.org/2000/svg"
+                       fill="none"
+                       viewBox="0 0 20 16">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                  </svg>
+                  <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="font-semibold">Click to upload</span> or drag and drop
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                </div>
+                <input id="dropzone-file" name="fabric_type" type="file" class="hidden" />
+              </label>
+            </div>
+            <div class="mb-5">
+              <label for="password"
+                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Code</label>
+              <input type="text"
+                     id="code"
+                     name="code"
+                     placeholder="A23DBAH"
+                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                     required />
+            </div>
+            <div class="mb-5">
+              <label for="color-code"
+                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Color</label>
+              <input type="text"
+                     id="color-code"
+                     name="color"
+                     placeholder="#000000"
+                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                     required />
+            </div>
+            <div class="mb-5">
+              <label for="stok"
+                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok</label>
+              <input type="number"
+                     id="stok"
+                     name="stok"
+                     placeholder="0"
+                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                     required />
+            </div>
+            
+            <div class="mb-5">
+              <label for="stok"
+                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok</label>
+              <input type="number"
+                     id="stok"
+                     name="stok"
+                     placeholder="0"
+                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                     required />
+            </div>
+            
             <button type="submit"
-                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-              Add Product
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add Product
             </button>
           </form>
         </div>

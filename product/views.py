@@ -17,6 +17,8 @@ def add_product(request):
             return redirect('products')
         else:
             print(form.errors)
+    else :
+        print("not valid")
         
     return redirect('products')
 def update_product(request, id):
