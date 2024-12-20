@@ -10,5 +10,5 @@ class InvoiceForm(forms.ModelForm):
 class InvoiceProductForm(forms.ModelForm):
     class Meta:
         model = InvoiceProduct
-        fields = ['product', 'total_metre', 'count']
+        fields = ['product', 'roll_metre', 'count']
 

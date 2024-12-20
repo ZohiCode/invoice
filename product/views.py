@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 # Create your views here.
 def products(request):
     products = Product.objects.all()
-    return render(request, 'products.jinja.html', {'products': products, })
+    return render(request, 'products.jinja.html', {'products': products})
 
 
 def add_product(request):

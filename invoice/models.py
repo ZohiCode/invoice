@@ -6,14 +6,14 @@ import string
 
 class InvoiceProduct(models.Model):
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
-    total_metre = models.FloatField(default=100)
+    roll_metre = models.FloatField(default=100)
     count = models.IntegerField(default=1)
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return f'{self.product.code} - > {self.invoice.costumer.name}'
     @property
     def total_price(self):
-        return self.total_metre * self.product.per_meter_price
+        return self.roll_metre * self.product.per_meter_price
 
 class Currency(models.Model):
     currency ={
@@ -46,7 +46,7 @@ class Invoice(models.Model):
 
     @property
     def total_metre(self):
-        return sum([item.total_metre*item.count for item in self.invoiceproduct_set.all()])
+        return sum([item.roll_metre*item.count for item in self.invoiceproduct_set.all()])
 
 
         
